@@ -10,8 +10,10 @@ const driver = neo4j.driver(url, neo4j.auth.basic(username, password), {
 const session = driver.session({ database });
 
 
-app.get("/", (req, res) => {
-  res.send({url,username});
+app.get("/",async (req, res) => {
+    const result = await session.run("Match (u:User) return u");
+  const results =  result.records.map((i) => i.get("u").properties);
+  res.send({results});
 });
 
 app.listen(5000, () => {
