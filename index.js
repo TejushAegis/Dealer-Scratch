@@ -8,7 +8,6 @@ const app = express()
 
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
-app.use('/other', model)
 
 app.use('/', user)
 // console.log("here")
@@ -19,4 +18,4 @@ app.listen(process.env.PORT)
 
 
 // Export the Express API
-module.exports = app;
+export {app};
