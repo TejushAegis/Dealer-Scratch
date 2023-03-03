@@ -1,21 +1,18 @@
 // Add Express
-import express from 'express'
-import user from './src/routes/user.js'
+const express = require("express");
 
-import dotenv from 'dotenv';
-dotenv.config();
-const app = express()
+// Initialize Express
+const app = express();
 
-app.use(express.json())
-app.use(express.urlencoded({extended:true}))
+// Create GET request
+app.get("/", (req, res) => {
+  res.send("Express on Vercel");
+});
 
-app.use('/', user)
-// console.log("here")
-
-app.listen(process.env.PORT)
-
-
-
+// Initialize server
+app.listen(5000, () => {
+  console.log("Running on port 5000.");
+});
 
 // Export the Express API
-export {app};
+module.exports(app);
