@@ -4,7 +4,7 @@ require('dotenv').config()
 const app = express();
 
 app.get("/", (req, res) => {
-  res.send(process.env);
+  res.send(process.env.url);
 });
 
 app.listen(5000, () => {
