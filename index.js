@@ -1,11 +1,10 @@
 const express = require("express");
 require('dotenv').config()
-console.log(process.env) 
 
 const app = express();
 
 app.get("/", (req, res) => {
-  res.send("Express on Vercel");
+  res.send(process.env);
 });
 
 app.listen(5000, () => {
