@@ -1,5 +1,5 @@
 // Add Express
-const express = require("express");
+import express from "express";
 
 // Initialize Express
 const app = express();
@@ -15,4 +15,4 @@ app.listen(5000, () => {
 });
 
 // Export the Express API
-module.exports(app);
+export default app;
