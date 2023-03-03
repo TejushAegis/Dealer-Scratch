@@ -11,7 +11,7 @@ const session = driver.session({ database });
 
 
 app.get("/", (req, res) => {
-  res.send(url,username);
+  res.send({url,username});
 });
 
 app.listen(5000, () => {
