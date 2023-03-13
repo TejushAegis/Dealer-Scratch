@@ -1,0 +1,120 @@
+{
+    "env": {
+        "browser": true,
+        "node": true,
+        "es2021": true
+    },
+    "extends": "eslint:recommended",
+    "overrides": [],
+    "parserOptions": {
+        "ecmaVersion": "latest",
+        "sourceType": "module"
+    },
+    "rules": {
+        "strict":["error","global"],
+        "quotes": [
+            "error",
+            "single",
+            {
+                "avoidEscape": true,
+                "allowTemplateLiterals": true
+            }
+        ],
+        "semi": [
+            "warn",
+            "always"
+        ],
+        "no-unused-vars": [
+            "warn"
+        ],
+        //Enforce camelcase naming convention
+        "camelcase":[
+            "warn"
+        ],
+        //Enforce consistent indentation
+        "indent":[
+            "error",
+            2,
+            {
+                "SwitchCase":1
+            }
+        ],
+        /*Disallow mixed binary operators 
+        eg: var foo = a && b || c || d;  (BAD: Unexpected mix of '&&' and '||'.) 
+        var foo = (a && b) || c || d; (GOOD)
+        */
+        "no-mixed-operators":"error",
+        //Enforce a maximum line length
+        "max-len":[
+            "warn",
+            {
+                "code":120
+            }
+        ],
+        //Enforce the consistent use of either function declarations or expressions
+        "func-style":["error","expression"],
+        //Disallow new operators with the Function object
+        "no-new-func":"error",
+        //Disallow reassigning function parameters
+        "no-param-reassign":"error",
+        //Require using arrow functions for callbacks
+        "prefer-arrow-callback":"error",
+        //Require parentheses around arrow function arguments
+        "arrow-parens":["error","always"],
+        //Require braces around arrow function bodies
+        "arrow-body-style":["error","as-needed"],
+        //Require constructor names to begin with a capital letter
+        "new-cap":"error",
+        //Disallow use of this in contexts where the value of this is undefined
+        "no-invalid-this":"error",
+        //Require destructuring from arrays and/or objects
+        "prefer-destructuring":["error", 
+        {
+            "array": true
+        }, 
+        {
+            "enforceForRenamedProperties": false
+        }],
+        // Disallow duplicate arguments in function definitions, keys in objects and if else conditions
+        "no-dupe-args":"error",
+        "no-dupe-keys":"error",
+        "no-dupe-else-if":"error",
+        //Disallow fallthrough of case statements
+        "no-fallthrough":"error",
+        /*Disallow control flow statements in finally blocks. JavaScript suspends the control flow statements of try and catch blocks until the execution of finally block finishes. So, when return, throw, break, or continue is used in finally, control flow statements inside try and catch are overwritten, which is considered as unexpected behavior.*/
+        "no-unsafe-finally":"error", //If you want to allow control flow operations in finally blocks, you can turn this rule off.
+        //Enforce consistent brace style for all control statements
+        "curly":[
+            "warn",
+            "multi"
+        ],
+        /*Disallow irregular whitespace. Invalid or irregular whitespace causes issues with ECMAScript 5 parsers and also makes code harder to debug in a similar nature to mixed tabs and spaces.*/
+        "no-irregular-whitespace":"warn",
+        /*Disallow invalid regular expression strings in RegExp constructors.
+        An invalid pattern in a regular expression literal is a SyntaxError when the code is parsed, but an invalid string in RegExp constructors throws a SyntaxError only when the code is executed.*/
+        "no-invalid-regexp":"error",
+        //Disallow async functions which have no await expression
+        "require-await":"error",
+        //Disallow assignments that can lead to race conditions due to usage of await or yield
+        "require-atomic-updates":[
+            "error",
+            {"allowProperties":true}
+        ],
+        //Enforce dot notation whenever possible
+        //not to be used when using chaining functions
+        // "dot-notation":[
+        //     "error",
+        //     {"allowKeywords":false}
+        // ],
+        //Require or disallow trailing commas
+        "comma-dangle":["warn","never"],
+        /*Disallow the use of eval(). JavaScript’s eval() function is potentially dangerous and is often misused. Using eval() on untrusted code can open a program up to several different injection attacks.*/
+        "no-eval":"error",
+        /*Disallow the use of eval()-like methods. It’s considered a good practice to avoid using eval() in JavaScript. There are security and performance implications involved with doing so, which is why many linters (including ESLint) recommend disallowing eval(). However, there are some other ways to pass a string and have it interpreted as JavaScript code that have similar concerns.*/
+        "no-implied-eval":"error",
+        //Require the use of === and !==
+        "eqeqeq":"error",
+        /*Disallow with statements. The with statement is potentially problematic because it adds members of an object to the current scope, making it impossible to tell what a variable inside the block actually refers to.*/
+        "no-with":"error"
+    }
+}

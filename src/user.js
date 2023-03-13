@@ -1,8 +1,8 @@
-const Router = require("express")
-const user = Router();
-require('dotenv').config()
-const neo4j = require('neo4j-driver')
-const nanoid = require('nanoid')
+const router = require('express');
+const user = router();
+require('dotenv').config();
+const neo4j = require('neo4j-driver');
+const nanoid = require('nanoid');
 const { url, username, password, database } = process.env;
 const driver = neo4j.driver(url, neo4j.auth.basic(username, password), {
   /* encrypted: 'ENCRYPTION_OFF' */
@@ -11,11 +11,11 @@ const session = driver.session({ database });
 
 const createUser = async function(user) {
   // const {user,configs} = req.body
-  let id = null
+  let id = null;
   // console.log(req.body)
-          // _id: '${nanoid(8)}', 
-    const check = await session.run(
-      `MATCH (u:User {
+  // _id: '${nanoid(8)}', 
+  const check = await session.run(
+    `MATCH (u:User {
         name: '${user.name}', 
         email:'${user.email}',
          city: '${user.city}',
@@ -23,11 +23,11 @@ const createUser = async function(user) {
           master: '${user.master}',
            distributor: '${user.distributor}'
          }) return u`
-    );
-    if(!check.records.length)
-    {
-      const result = await session.run(
-        `CREATE (u:User {
+  );
+  if(!check.records.length)
+  {
+    const result = await session.run(
+      `CREATE (u:User {
           name: '${user.name}', 
           _id: '${nanoid(8)}',
           email:'${user.email}',
@@ -36,14 +36,14 @@ const createUser = async function(user) {
             master: '${user.master}',
              distributor: '${user.distributor}'
            }) return u`
-      );
-      id =  result.records[0].get("u").properties._id;    
-    }
-    else
-     id =  check.records[0].get("u").properties._id;    
+    );
+    id =  result.records[0].get('u').properties._id;    
+  }
+  else
+    id =  check.records[0].get('u').properties._id;    
 
-     return id
-}
+  return id;
+};
 
 // user.get("/getConfigsx/:id", async (req, res) => {
 // let result = await session.run(`MATCH (u:User  {_id: '${req.params.id}'})
@@ -197,187 +197,154 @@ const createUser = async function(user) {
   
 // })
 
-user.delete("/deleteByName/:type/:name",  async (req,res) => {
+user.delete('/deleteByName/:type/:name',  async (req,res) => {
   await session.run(`MATCH (i:'${req.params.type}' {name:'${req.params.name}'})-[r]-() DELETE r`);
   await session.run(`MATCH (i:'${req.params.type}' {name:'${req.params.name}'}) DELETE i`);
-  return res.send()
-})
+  return res.send();
+});
 
-user.delete("/deleteEvery/",  async (req,res) => {
+user.delete('/deleteEvery/',  async (req,res) => {
   await session.run(`MATCH (n)
   OPTIONAL MATCH (n)-[r]-()
   DELETE n,r
   `);
-  return res.send()
-})
+  return res.send();
+});
 
-user.get("/getConfigs/:id", async (req,res) => {
+user.get('/getConfigs/:id', async (req,res) => {
 
- let result = await session.run(
-  ` MATCH path = (n:User)-[r*]->(a:Amount)
+  let result = await session.run(
+    ` MATCH path = (n:User)-[r*]->(a:Amount)
   WHERE n._id = '${req.params.id}'
   RETURN path
- `)
+ `);
 
- let nodes = result.records.map(record => {
+  let nodes = result.records.map((record) => {
 
-  //getting segment of each record
-  let seg =  record._fields[0].segments
+    //getting segment of each record
+    let seg =  record._fields[0].segments;
 
-  //getting start of each segment
-  let out = seg.map( records => {
-      return {[records.start.labels]:records.start.properties.name}
-  })
+    //getting start of each segment
+    let out = seg.map( (records) => ({[records.start.labels]:records.start.properties.name}));
 
-  //converting array to object and adding amounts
-  let obj = Object.assign({}, ...out);
-  let obj2 = Object.assign(obj,record._fields[0].end.properties)
+    //converting array to object and adding amounts
+    let obj = Object.assign({}, ...out);
+    let obj2 = Object.assign(obj,record._fields[0].end.properties);
 
-  return obj2
-})
+    return obj2;
+  });
 
-  res.send(nodes)
+  res.send(nodes);
 
-})
+});
 
-user.post("/singleConfig", async (req,res) => {
+user.post('/singleConfig', async (req,res) => {
 
-// const {insurer, dealer, model, policy, category } = req.body.config
+  const {insurer, dealer, model, policy, category } = req.body.config;
+  let query = `OPTIONAL MATCH (u:User {_id: '${dealer}'})`;
 
-//   let result = await session.run(
-// `OPTIONAL MATCH (u:User {_id: '${dealer}'})
-// OPTIONAL MATCH (i:Insurer {name: '${insurer}'} )
-// OPTIONAL MATCH (u)-[r1:USER_INSURER]->(i)
-// OPTIONAL MATCH (u)-[]->(ua:Amount)
-// OPTIONAL MATCH (p:Policy {name: '${policy}'} )
-// OPTIONAL MATCH (i)-[r2:INSURER_POLICY]->(p)
-// OPTIONAL MATCH (i)-[]->(ia:Amount)
-// OPTIONAL MATCH (c:Category {name: '${category}'})
-// OPTIONAL MATCH (p)-[r3:POLICY_CATEGORY]->(c)
-// OPTIONAL MATCH (p)-[]->(pa:Amount)
-// OPTIONAL MATCH (m:Model {name: '${model}'} )
-// OPTIONAL MATCH (c)-[r4:CATEGORY_MODEL]->(m)
-// OPTIONAL MATCH (c)-[]->(ca:Amount)
-// OPTIONAL MATCH (m)-[]->(ma:Amount)
-// RETURN m, i, p, u, ma, ia, pa, ua, ca
-// `)
-// let out = null
+  let pass = [1,'u','USER'];
+  // block : {
 
-// let pa = result.records[0].get("pa")
-// let ma =result.records[0].get("ma")
-// let ia =result.records[0].get("ia")
-// let ua =result.records[0].get("ua")
-// let ca =result.records[0].get("ca")
-
-//  out = ma?ma:ca?ca:pa?pa:ia?ia:ua
-
-// // console.log(out)
-// res.send(out.properties)
-const {insurer, dealer, model, policy, category } = req.body.config
-let query = `OPTIONAL MATCH (u:User {_id: '${dealer}'})`;
-
-    let pass = [1,'u','USER']
-    // block : {
-
-      if(insurer!=='All')
-      {
-        query+= `\nOPTIONAL MATCH (i:Insurer {name: '${insurer}'})
+  if(insurer!=='All')
+  {
+    query+= `\nOPTIONAL MATCH (i:Insurer {name: '${insurer}'})
         OPTIONAL MATCH (${pass[1]})-[r${pass[0]}:${pass[2]}_INSURER]->(i)
-        `
+        `;
         
-        pass=[++pass[0],'i','INSURER']
-      }
-      if(policy!=='All')
-      {
-        query+= `\nOPTIONAL MATCH (p:Policy {name: '${policy}'})
+    pass=[++pass[0],'i','INSURER'];
+  }
+  if(policy!=='All')
+  {
+    query+= `\nOPTIONAL MATCH (p:Policy {name: '${policy}'})
         OPTIONAL MATCH (${pass[1]})-[r${pass[0]}:${pass[2]}_POLICY]->(p)
-        `
-        pass=[++pass[0],'p','POLICY']
-      }
-      if(category!=='All')
-      {
-        query+= `\nOPTIONAL MATCH (c:Category {name: '${category}'})
+        `;
+    pass=[++pass[0],'p','POLICY'];
+  }
+  if(category!=='All')
+  {
+    query+= `\nOPTIONAL MATCH (c:Category {name: '${category}'})
         OPTIONAL MATCH (${pass[1]})-[r${pass[0]}:${pass[2]}_CATEGORY]->(c)
-        `
-        pass=[++pass[0],'c','CATEGORY']
-      }
-      if(model!=='All')
-      {
-        query+= `\nOPTIONAL MATCH (m:Model {name: '${model}'})
+        `;
+    pass=[++pass[0],'c','CATEGORY'];
+  }
+  if(model!=='All')
+  {
+    query+= `\nOPTIONAL MATCH (m:Model {name: '${model}'})
         OPTIONAL MATCH (${pass[1]})-[r${pass[0]}:${pass[2]}_MODEL]->(m)
-        `
-        pass=[++pass[0],'m','MODEL']
-      }
+        `;
+    pass=[++pass[0],'m','MODEL'];
+  }
 
-      query += `\nOPTIONAL MATCH (${pass[1]})-[r${pass[0]}:${pass[2]}_AMOUNT]->(a:Amount)
+  query += `\nOPTIONAL MATCH (${pass[1]})-[r${pass[0]}:${pass[2]}_AMOUNT]->(a:Amount)
       
       return a`;
 
-    // }
+  // }
 
-    console.log(query)
-    const result = await session.run(query);
-    let out = result.records[0].get("a")
-    return res.send(out.properties)
+  console.log(query);
+  const result = await session.run(query);
+  let out = result.records[0].get('a');
+  return res.send(out.properties);
 
-})
+});
 
-user.post("/sparseConfig", async (req,res) => {
+user.post('/sparseConfig', async (req,res) => {
 
-  const {user,configs} = req.body
+  const {user,configs} = req.body;
 
-  const id =  await createUser(user)   
+  const id =  await createUser(user);   
  
   for (let i = 0; i < configs.length; i++) {
 
     let query = `MERGE (u:User {_id: '${id}'})`;
     const { category, model, insurer, policy, payout, od, acpl } = configs[i];
-    let pass = [1,'u','USER']
+    let pass = [1,'u','USER'];
     // block : {
 
-      if(insurer!=='All')
-      {
-        query+= `\nMERGE (i:Insurer {name: '${insurer}'})
+    if(insurer!=='All')
+    {
+      query+= `\nMERGE (i:Insurer {name: '${insurer}'})
         MERGE (${pass[1]})-[r${pass[0]}:${pass[2]}_INSURER]->(i)
-        `
+        `;
         
-        pass=[++pass[0],'i','INSURER']
-      }
-      if(policy!=='All')
-      {
-        query+= `\nMERGE (p:Policy {name: '${policy}'})
+      pass=[++pass[0],'i','INSURER'];
+    }
+    if(policy!=='All')
+    {
+      query+= `\nMERGE (p:Policy {name: '${policy}'})
         MERGE (${pass[1]})-[r${pass[0]}:${pass[2]}_POLICY]->(p)
-        `
-        pass=[++pass[0],'p','POLICY']
-      }
-      if(category!=='All')
-      {
-        query+= `\nMERGE (c:Category {name: '${category}'})
+        `;
+      pass=[++pass[0],'p','POLICY'];
+    }
+    if(category!=='All')
+    {
+      query+= `\nMERGE (c:Category {name: '${category}'})
         MERGE (${pass[1]})-[r${pass[0]}:${pass[2]}_CATEGORY]->(c)
-        `
-        pass=[++pass[0],'c','CATEGORY']
-      }
-      if(model!=='All')
-      {
-        query+= `\nMERGE (m:Model {name: '${model}'})
+        `;
+      pass=[++pass[0],'c','CATEGORY'];
+    }
+    if(model!=='All')
+    {
+      query+= `\nMERGE (m:Model {name: '${model}'})
         MERGE (${pass[1]})-[r${pass[0]}:${pass[2]}_MODEL]->(m)
-        `
-        pass=[++pass[0],'m','MODEL']
-      }
+        `;
+      pass=[++pass[0],'m','MODEL'];
+    }
 
-      query += `\nMERGE (a: Amount {payout:'${payout}', od:'${od}', acpl:'${acpl}' })
+    query += `\nMERGE (a: Amount {payout:'${payout}', od:'${od}', acpl:'${acpl}' })
       MERGE (${pass[1]})-[r${pass[0]}:${pass[2]}_AMOUNT]->(a)`;
 
     // }
 
-    console.log(query)
+    console.log(query);
     const create = await session.run(query);
-    return res.send(create)
+    return res.send(create);
 
   }
 
-})
+});
 
 
 
-module.exports = user
+module.exports = user;
