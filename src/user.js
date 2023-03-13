@@ -127,6 +127,75 @@ const createUser = async function(user) {
 //     }
 //     return res.send()
 // })
+// user.post("/createConfig", async (req,res) => {
+
+//   // await session.run(`MATCH (n)
+//   // OPTIONAL MATCH (n)-[r]-()
+//   // DELETE n,r
+//   // `);
+
+//   const {user,configs} = req.body
+
+//   const id =  await createUser(user)   
+ 
+//   for (let i = 0; i < configs.length; i++) {
+
+//     let query = `MERGE (u:User {_id: '${id}'})`;
+//     const { category, model, insurer, policy, payout, od, acpl } = configs[i];
+
+//     block : {
+//       if (insurer !== 'All') {
+//         query += `\nMERGE (i:Insurer {name: '${insurer}'})
+//         MERGE (u)-[r1:USER_INSURER]->(i)`;
+//       } else {
+//         query += `\nMERGE (a: Amount {payout:'${payout}', od:'${od}', acpl:'${acpl}' })
+//         MERGE (u)-[r1:AMOUNT]->(a)`;
+//         break block;
+//       }
+      
+//       if (policy !== 'All') {
+//         query += `\nMERGE (p:Policy {name: '${policy}'})
+//         MERGE (i)-[r2:INSURER_POLICY]->(p)`;
+//       } else {
+//         query += `\nMERGE (a: Amount {payout:'${payout}', od:'${od}', acpl:'${acpl}' })
+//         MERGE (i)-[r2:AMOUNT]->(a)`;
+//         break block;
+//       }
+
+//       if (category !== 'All') {
+//         query += `\nMERGE (c:Category {name: '${category}'})
+//         MERGE (p)-[r3:POLICY_CATEGORY]-> (c)`;
+//       } else {
+//         query += `\nMERGE (a: Amount {payout:'${payout}', od:'${od}', acpl:'${acpl}' })
+//         MERGE (p)-[r3:AMOUNT]->(a)`;
+//         break block;
+//       }
+      
+//       if (model !== 'All') {
+//         query += `\nMERGE (m:Model {name: '${model}'})
+//         MERGE (c)-[r4:CATEGORY_MODEL] -> (m)`;
+//       } else {
+//         query += `\nMERGE (a: Amount {payout:'${payout}', od:'${od}', acpl:'${acpl}' })
+//         MERGE (c)-[r4:AMOUNT]->(a)`;
+//         break block;
+//       }
+
+//       query += `\nMERGE (a: Amount {payout:'${payout}', od:'${od}', acpl:'${acpl}' })
+//         MERGE (m)-[r5:AMOUNT]->(a)`;
+//         break block;
+
+//     }
+//     // console.log(query); // Output the generated query for debugging purposes
+  
+//   // Use a Neo4j driver to execute the generated query
+//     const create = await session.run(query);
+//     // console.log(create);
+
+//   }
+
+//   return res.send()
+  
+// })
 
 user.delete("/deleteByName/:type/:name",  async (req,res) => {
   await session.run(`MATCH (i:'${req.params.type}' {name:'${req.params.name}'})-[r]-() DELETE r`);
@@ -140,76 +209,6 @@ user.delete("/deleteEvery/",  async (req,res) => {
   DELETE n,r
   `);
   return res.send()
-})
-
-user.post("/createConfig", async (req,res) => {
-
-  // await session.run(`MATCH (n)
-  // OPTIONAL MATCH (n)-[r]-()
-  // DELETE n,r
-  // `);
-
-  const {user,configs} = req.body
-
-  const id =  await createUser(user)   
- 
-  for (let i = 0; i < configs.length; i++) {
-
-    let query = `MERGE (u:User {_id: '${id}'})`;
-    const { category, model, insurer, policy, payout, od, acpl } = configs[i];
-
-    block : {
-      if (insurer !== 'All') {
-        query += `\nMERGE (i:Insurer {name: '${insurer}'})
-        MERGE (u)-[r1:USER_INSURER]->(i)`;
-      } else {
-        query += `\nMERGE (a: Amount {payout:'${payout}', od:'${od}', acpl:'${acpl}' })
-        MERGE (u)-[r1:AMOUNT]->(a)`;
-        break block;
-      }
-      
-      if (policy !== 'All') {
-        query += `\nMERGE (p:Policy {name: '${policy}'})
-        MERGE (i)-[r2:INSURER_POLICY]->(p)`;
-      } else {
-        query += `\nMERGE (a: Amount {payout:'${payout}', od:'${od}', acpl:'${acpl}' })
-        MERGE (i)-[r2:AMOUNT]->(a)`;
-        break block;
-      }
-
-      if (category !== 'All') {
-        query += `\nMERGE (c:Category {name: '${category}'})
-        MERGE (p)-[r3:POLICY_CATEGORY]-> (c)`;
-      } else {
-        query += `\nMERGE (a: Amount {payout:'${payout}', od:'${od}', acpl:'${acpl}' })
-        MERGE (p)-[r3:AMOUNT]->(a)`;
-        break block;
-      }
-      
-      if (model !== 'All') {
-        query += `\nMERGE (m:Model {name: '${model}'})
-        MERGE (c)-[r4:CATEGORY_MODEL] -> (m)`;
-      } else {
-        query += `\nMERGE (a: Amount {payout:'${payout}', od:'${od}', acpl:'${acpl}' })
-        MERGE (c)-[r4:AMOUNT]->(a)`;
-        break block;
-      }
-
-      query += `\nMERGE (a: Amount {payout:'${payout}', od:'${od}', acpl:'${acpl}' })
-        MERGE (m)-[r5:AMOUNT]->(a)`;
-        break block;
-
-    }
-    // console.log(query); // Output the generated query for debugging purposes
-  
-  // Use a Neo4j driver to execute the generated query
-    const create = await session.run(query);
-    // console.log(create);
-
-  }
-
-  return res.send()
-  
 })
 
 user.get("/getConfigs/:id", async (req,res) => {
@@ -243,37 +242,139 @@ user.get("/getConfigs/:id", async (req,res) => {
 
 user.post("/singleConfig", async (req,res) => {
 
+// const {insurer, dealer, model, policy, category } = req.body.config
+
+//   let result = await session.run(
+// `OPTIONAL MATCH (u:User {_id: '${dealer}'})
+// OPTIONAL MATCH (i:Insurer {name: '${insurer}'} )
+// OPTIONAL MATCH (u)-[r1:USER_INSURER]->(i)
+// OPTIONAL MATCH (u)-[]->(ua:Amount)
+// OPTIONAL MATCH (p:Policy {name: '${policy}'} )
+// OPTIONAL MATCH (i)-[r2:INSURER_POLICY]->(p)
+// OPTIONAL MATCH (i)-[]->(ia:Amount)
+// OPTIONAL MATCH (c:Category {name: '${category}'})
+// OPTIONAL MATCH (p)-[r3:POLICY_CATEGORY]->(c)
+// OPTIONAL MATCH (p)-[]->(pa:Amount)
+// OPTIONAL MATCH (m:Model {name: '${model}'} )
+// OPTIONAL MATCH (c)-[r4:CATEGORY_MODEL]->(m)
+// OPTIONAL MATCH (c)-[]->(ca:Amount)
+// OPTIONAL MATCH (m)-[]->(ma:Amount)
+// RETURN m, i, p, u, ma, ia, pa, ua, ca
+// `)
+// let out = null
+
+// let pa = result.records[0].get("pa")
+// let ma =result.records[0].get("ma")
+// let ia =result.records[0].get("ia")
+// let ua =result.records[0].get("ua")
+// let ca =result.records[0].get("ca")
+
+//  out = ma?ma:ca?ca:pa?pa:ia?ia:ua
+
+// // console.log(out)
+// res.send(out.properties)
 const {insurer, dealer, model, policy, category } = req.body.config
+let query = `OPTIONAL MATCH (u:User {_id: '${dealer}'})`;
 
-  let result = await session.run(
-`OPTIONAL MATCH (u:User {_id: '${dealer}'})
-OPTIONAL MATCH (i:Insurer {name: '${insurer}'} )
-OPTIONAL MATCH (u)-[r1:USER_INSURER]->(i)
-OPTIONAL MATCH (u)-[]->(ua:Amount)
-OPTIONAL MATCH (p:Policy {name: '${policy}'} )
-OPTIONAL MATCH (i)-[r2:INSURER_POLICY]->(p)
-OPTIONAL MATCH (i)-[]->(ia:Amount)
-OPTIONAL MATCH (c:Category {name: '${category}'})
-OPTIONAL MATCH (p)-[r3:POLICY_CATEGORY]->(c)
-OPTIONAL MATCH (p)-[]->(pa:Amount)
-OPTIONAL MATCH (m:Model {name: '${model}'} )
-OPTIONAL MATCH (c)-[r4:CATEGORY_MODEL]->(m)
-OPTIONAL MATCH (c)-[]->(ca:Amount)
-OPTIONAL MATCH (m)-[]->(ma:Amount)
-RETURN m, i, p, u, ma, ia, pa, ua, ca
-`)
-let out = null
+    let pass = [1,'u','USER']
+    // block : {
 
-let pa = result.records[0].get("pa")
-let ma =result.records[0].get("ma")
-let ia =result.records[0].get("ia")
-let ua =result.records[0].get("ua")
-let ca =result.records[0].get("ca")
+      if(insurer!=='All')
+      {
+        query+= `\nOPTIONAL MATCH (i:Insurer {name: '${insurer}'})
+        OPTIONAL MATCH (${pass[1]})-[r${pass[0]}:${pass[2]}_INSURER]->(i)
+        `
+        
+        pass=[++pass[0],'i','INSURER']
+      }
+      if(policy!=='All')
+      {
+        query+= `\nOPTIONAL MATCH (p:Policy {name: '${policy}'})
+        OPTIONAL MATCH (${pass[1]})-[r${pass[0]}:${pass[2]}_POLICY]->(p)
+        `
+        pass=[++pass[0],'p','POLICY']
+      }
+      if(category!=='All')
+      {
+        query+= `\nOPTIONAL MATCH (c:Category {name: '${category}'})
+        OPTIONAL MATCH (${pass[1]})-[r${pass[0]}:${pass[2]}_CATEGORY]->(c)
+        `
+        pass=[++pass[0],'c','CATEGORY']
+      }
+      if(model!=='All')
+      {
+        query+= `\nOPTIONAL MATCH (m:Model {name: '${model}'})
+        OPTIONAL MATCH (${pass[1]})-[r${pass[0]}:${pass[2]}_MODEL]->(m)
+        `
+        pass=[++pass[0],'m','MODEL']
+      }
 
- out = ma?ma:ca?ca:pa?pa:ia?ia:ua
+      query += `\nOPTIONAL MATCH (${pass[1]})-[r${pass[0]}:${pass[2]}_AMOUNT]->(a:Amount)
+      
+      return a`;
 
-// console.log(out)
-res.send(out.properties)
+    // }
+
+    console.log(query)
+    const result = await session.run(query);
+    let out = result.records[0].get("a")
+    return res.send(out.properties)
+
+})
+
+user.post("/sparseConfig", async (req,res) => {
+
+  const {user,configs} = req.body
+
+  const id =  await createUser(user)   
+ 
+  for (let i = 0; i < configs.length; i++) {
+
+    let query = `MERGE (u:User {_id: '${id}'})`;
+    const { category, model, insurer, policy, payout, od, acpl } = configs[i];
+    let pass = [1,'u','USER']
+    // block : {
+
+      if(insurer!=='All')
+      {
+        query+= `\nMERGE (i:Insurer {name: '${insurer}'})
+        MERGE (${pass[1]})-[r${pass[0]}:${pass[2]}_INSURER]->(i)
+        `
+        
+        pass=[++pass[0],'i','INSURER']
+      }
+      if(policy!=='All')
+      {
+        query+= `\nMERGE (p:Policy {name: '${policy}'})
+        MERGE (${pass[1]})-[r${pass[0]}:${pass[2]}_POLICY]->(p)
+        `
+        pass=[++pass[0],'p','POLICY']
+      }
+      if(category!=='All')
+      {
+        query+= `\nMERGE (c:Category {name: '${category}'})
+        MERGE (${pass[1]})-[r${pass[0]}:${pass[2]}_CATEGORY]->(c)
+        `
+        pass=[++pass[0],'c','CATEGORY']
+      }
+      if(model!=='All')
+      {
+        query+= `\nMERGE (m:Model {name: '${model}'})
+        MERGE (${pass[1]})-[r${pass[0]}:${pass[2]}_MODEL]->(m)
+        `
+        pass=[++pass[0],'m','MODEL']
+      }
+
+      query += `\nMERGE (a: Amount {payout:'${payout}', od:'${od}', acpl:'${acpl}' })
+      MERGE (${pass[1]})-[r${pass[0]}:${pass[2]}_AMOUNT]->(a)`;
+
+    // }
+
+    console.log(query)
+    const create = await session.run(query);
+    return res.send(create)
+
+  }
 
 })
 
